@@ -113,7 +113,7 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
         raise ValueError(f"Export type {export_type} is not supported")
 
     ### Create the export directory
-    save_path = export_path / f"{data_path.name}_{export_type}"
+    save_path = export_path / f"{data_path.name}__{selected_segment}__{export_type}"
     create_directory(save_path)
     
     if use_pandas:
@@ -127,7 +127,7 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
         ### Create a dataframe to store the results
         df = pd.DataFrame(columns=["patient_id", "n_segment"])
     else:
-        save_log_path = export_path/f"{data_path.name}_{export_type}_export.log"
+        save_log_path = export_path/f"{save_path.name}__log.log"
         f_log = open(save_log_path, "w")
 
     ### Get the list of patient ids
@@ -135,7 +135,6 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
 
 
     ### --------- Iterate through each row --------- ###
-    counter = 0
     for patient_id in patient_ids:
         ### Skip the patient if it is in the skip_image_id list
         if patient_id in skip_image_id:
@@ -170,7 +169,7 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
 
     ### Save the results to an excel file
     if use_pandas:
-        save_excel_path = export_path/f"{data_path.name}_{export_type}_export.xlsx"
+        save_excel_path = export_path/f"{save_path.name}__log.xlsx"
         df.to_excel(save_excel_path, index=False)
         print(f"Saved excel file {len(df)} rows to {save_excel_path}")
     else:
