@@ -20,7 +20,11 @@ import shutil
 
 
 def export_segmentation(file_path:Path, save_path:Path, writer):
-    segmentationNode = slicer.util.loadSegmentation(file_path, properties={"name":file_path.parents[1].name})
+    try:
+        segmentationNode = slicer.util.loadSegmentation(file_path, properties={"name":file_path.parents[1].name})
+    except RuntimeError as e:
+        print(f"\n#RuntimeError: {file_path}\n{e}")
+        return -2
 
     ### Segmentation can only be shown in 3D if closed surface representation (or other 3D-displayable representation) is available.
     ### Return: True or False
