@@ -20,6 +20,10 @@ import shutil
 
 
 def export_segmentation(file_path:Path, save_path:Path, writer):
+    ### Try to load the segmentation
+    ### TotalSegmentator dataset has some errors:
+    ### + https://github.com/wasserth/TotalSegmentator/issues/68
+    ### + https://github.com/wasserth/TotalSegmentator/issues/461
     try:
         segmentationNode = slicer.util.loadSegmentation(file_path, properties={"name":file_path.parents[1].name})
     except RuntimeError as e:
@@ -140,6 +144,7 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
 
     ### --------- Iterate through each row --------- ###
     count = 0
+    error_patient_ids = []
     for patient_id in patient_ids:
         ### Skip the patient if it is in the skip_image_id list
         if patient_id in skip_image_id:
@@ -163,7 +168,12 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
 
         ### Export the segmentation
         _status = export_segmentation(seg_path, save_path, writer)
+        
+        ### If the export failed, add the patient_id to the error_patient_ids list
+        if _status == -2:
+            error_patient_ids.append(patient_id)
 
+        ### Log the result
         if use_pandas:
             df.loc[len(df)] = [patient_id, _status] ### Add a new row with patient_id and _status (number of segments or -1 if failed)
         else:
@@ -178,12 +188,15 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
 
 
     print(f"Exported {count} patients")
+    if error_patient_ids:
+        print(f"Error patient ids: {error_patient_ids}")
     ### Save the results to an excel file
     if use_pandas:
         save_excel_path = export_path/f"{save_path.name}__log.xlsx"
         df.to_excel(save_excel_path, index=False)
         print(f"Saved excel file to {save_excel_path}")
     else:
+        f_log.write(f"Error patient ids: {error_patient_ids}\n")
         f_log.close()
         print(f"Saved log file to {save_log_path}")
 
@@ -203,7 +216,8 @@ if __name__ == "__main__":
 
     ### Some error files that 3DSlicer can't load
     ### Ref similar case: https://github.com/wasserth/TotalSegmentator/issues/268
-    skip_image_id = ['s1406', 's1407', 's1409', 's1417', 's1419']
+    # skip_image_id = ['s1406', 's1407', 's1409', 's1417', 's1419'] ### These are for liver
+    skip_image_id = []
 
     main(
         data_path=TotalSegmentor_path, 
