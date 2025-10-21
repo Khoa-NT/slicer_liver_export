@@ -94,7 +94,7 @@ def create_directory(path:Path):
 
 
 def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_type:str="obj", 
-         skip_image_id:list[str]=None, use_pandas:bool=False):
+         skip_image_id:list[str]=None, use_pandas:bool=False, debug:bool=False):
     if skip_image_id is None:
         skip_image_id = []
 
@@ -135,6 +135,7 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
 
 
     ### --------- Iterate through each row --------- ###
+    count = 0
     for patient_id in patient_ids:
         ### Skip the patient if it is in the skip_image_id list
         if patient_id in skip_image_id:
@@ -167,11 +168,17 @@ def main(data_path:Path, export_path:Path, selected_segment:str="liver", export_
         ### Delete temporary node
         slicer.mrmlScene.Clear()
 
+        count += 1
+        if debug and count > 10:
+            break
+
+
+    print(f"Exported {count} patients")
     ### Save the results to an excel file
     if use_pandas:
         save_excel_path = export_path/f"{save_path.name}__log.xlsx"
         df.to_excel(save_excel_path, index=False)
-        print(f"Saved excel file {len(df)} rows to {save_excel_path}")
+        print(f"Saved excel file to {save_excel_path}")
     else:
         f_log.close()
         print(f"Saved log file to {save_log_path}")
