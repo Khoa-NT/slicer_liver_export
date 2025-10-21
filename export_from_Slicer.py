@@ -24,6 +24,7 @@ def export_segmentation(file_path:Path, save_path:Path, writer):
     ### TotalSegmentator dataset has some errors:
     ### + https://github.com/wasserth/TotalSegmentator/issues/68
     ### + https://github.com/wasserth/TotalSegmentator/issues/461
+    ### + https://github.com/MIC-DKFZ/nnDetection/issues/24#issuecomment-2627684467
     try:
         segmentationNode = slicer.util.loadSegmentation(file_path, properties={"name":file_path.parents[1].name})
     except RuntimeError as e:
