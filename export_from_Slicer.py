@@ -185,17 +185,23 @@ if __name__ == "__main__":
     export_path = Path("/Users/khoanguyen-tuan/Local/Data_set/test_3DSlicer_export")
 
     ### Selected segment to export
-    selected_segment = "liver" ### {liver, heart}
+    selected_segment = "heart" ### {liver, heart, spleen, }
 
     ### Export type
-    export_type = "obj" ### {obj, stl, ply}
+    export_type = "stl" ### {obj, stl, ply}
 
     ### Some error files that 3DSlicer can't load
     ### Ref similar case: https://github.com/wasserth/TotalSegmentator/issues/268
     skip_image_id = ['s1406', 's1407', 's1409', 's1417', 's1419']
 
-    main(data_path=TotalSegmentor_path, export_path=export_path, export_type=export_type, 
-         skip_image_id=skip_image_id, use_pandas=False)
+    main(
+        data_path=TotalSegmentor_path, 
+        export_path=export_path, 
+        export_type=export_type, 
+        selected_segment=selected_segment,
+        skip_image_id=skip_image_id, 
+        use_pandas=False ### If True, the results will be saved to an excel file
+    )
     print("Done")
     
     # exit() ### Uncomment this if you want to exit the 3DSlicer after the script is done
